@@ -5,12 +5,11 @@ import { ComputePiDto } from "./dto/compute-pi.dto";
 
 @Injectable()
 export class PiService {
-    // @InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
     private readonly logger = new Logger(PiService.name);
 
     computePiDecimal({ fromIteration, toIteration }: ComputePiDto) {
-        const startAt = new Decimal(fromIteration);
-        const endAt = new Decimal(toIteration);
+        const startAt = new Decimal(fromIteration.toString());
+        const endAt = new Decimal(toIteration.toString());
         let sign = startAt.mod(4).eq(0) ? -1 : 1;
         let accumulator = new Decimal(0);
 

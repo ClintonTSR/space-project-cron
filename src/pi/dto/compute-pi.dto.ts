@@ -1,6 +1,9 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsUUID } from "class-validator";
 
 export class ComputePiDto {
+    @IsUUID()
+    id!: string;
+
     @IsNumber()
     @IsNotEmpty()
     fromIteration!: number;

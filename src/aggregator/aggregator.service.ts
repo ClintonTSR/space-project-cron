@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { PiTicketEntity } from "../common/entities/pi_ticket.entity";
 import { DB_CONNECTION_NAME } from "../common/constants/db.contants";
@@ -11,7 +11,7 @@ import Decimal from "decimal.js";
 
 @Injectable()
 export class AggregatorService {
-    // private readonly logger = new Logger(AggregatorService.name)
+    private readonly logger = new Logger(AggregatorService.name)
 
     constructor(@InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
                 private piTicketRepo: Repository<PiTicketEntity>,
@@ -48,15 +48,13 @@ export class AggregatorService {
             order: { iteration: "DESC" }
         });
 
-        // const latestIteration = await this.piDecimalRepo.maximum('iteration')
-        // const piDecimal = await this.piDecimalRepo.findOne({ where: { iteration: latestIteration } })
         const pi = new Decimal(piDecimal?.result ?? 3);
         const updatedPi = pi.plus(new Decimal(decimal))
         const newIteration = this.piDecimalRepo.create({
             iteration,
             result: updatedPi.toString()
         })
-        
+
         return this.piDecimalRepo.save(newIteration);
         //
         // const truncatedPi = pi.toDecimalPlaces(digitCount, Decimal.ROUND_DOWN);

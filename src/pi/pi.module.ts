@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PiService } from './pi.service';
 import { PiController } from './pi.controller';
-import { AggregatorModule } from "../aggregator/aggregator.module";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
     imports: [
-        AggregatorModule,
         ClientsModule.register([
             {
                 name: "PI_SERVICE",

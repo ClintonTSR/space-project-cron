@@ -1,6 +1,6 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 import { AggregatorService } from './aggregator.service';
-import { EventPattern } from "@nestjs/microservices";
+import { ClientProxy, EventPattern } from "@nestjs/microservices";
 import { PiTicketCompletedDto } from "./dto/pi-ticket-completed.dto";
 
 @Controller()
@@ -8,7 +8,13 @@ export class AggregatorController {
     private readonly logger = new Logger(AggregatorController.name)
 
     constructor(private readonly aggregatorService: AggregatorService,
-    ) {
+                @Inject('AGGREGATOR_SERVICE') private readonly client: ClientProxy) {
+    }
+
+    @EventPattern('pi.compute_idle')
+    async distributePiTicket() {
+        const ticket = await this.aggregatorService.registerTicket();
+        this.client.emit('pi.pi_ticket_available', ticket);
     }
 
     @EventPattern('pi.compute_completed')
@@ -22,7 +28,7 @@ export class AggregatorController {
             });
         }
 
-        const latestPi = await this.aggregatorService.updatePiDecimal({
+        await this.aggregatorService.updatePiDecimal({
             iteration: dto.toIteration,
             decimal: dto.result
         })
