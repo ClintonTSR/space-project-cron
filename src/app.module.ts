@@ -6,9 +6,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DB_CONNECTION_NAME } from "./common/constants/db.contants";
-// import { ProcessorModule } from './processor/processor.module';
 import { PiTicketEntity } from "./common/entities/pi_ticket.entity";
-import { AggregratorModule } from './aggregrator/aggregrator.module';
 import { AggregatorModule } from './aggregator/aggregator.module';
 
 @Module({
@@ -35,7 +33,6 @@ import { AggregatorModule } from './aggregator/aggregator.module';
         }),
         ScheduleModule.forRoot(),
         PiModule,
-        AggregratorModule,
         AggregatorModule,
     ],
     controllers: [AppController],
