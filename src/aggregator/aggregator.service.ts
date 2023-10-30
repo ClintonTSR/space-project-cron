@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { PiTicketEntity } from "../common/entities/pi_ticket.entity";
 import { DB_CONNECTION_NAME } from "../common/constants/db.contants";
-import { Repository } from "typeorm";
+import { IsNull, Not, Repository } from "typeorm";
 import { PI_CALCULATION_CHUNK_SIZE } from "../common/constants/config.contants";
 import { PiTicketCompletedDto } from "./dto/pi-ticket-completed.dto";
 import { UpdatePiDecimalDto } from "./dto/update-pi-decimal.dto";
@@ -11,17 +11,29 @@ import Decimal from "decimal.js";
 
 @Injectable()
 export class AggregatorService {
-    @InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
-    private piTicketRepo: Repository<PiTicketEntity>
-    private piDecimalRepo: Repository<PiDecimalEntity>
-    private readonly logger = new Logger(AggregatorService.name);
+    // private readonly logger = new Logger(AggregatorService.name)
+
+    constructor(@InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
+                private piTicketRepo: Repository<PiTicketEntity>,
+                @InjectRepository(PiDecimalEntity, DB_CONNECTION_NAME)
+                private piDecimalRepo: Repository<PiDecimalEntity>,
+    ) {
+    }
 
     async registerTicket() {
-        const latestIteration = await this.piTicketRepo.maximum('toIteration');
-        return this.piTicketRepo.create({
+        const prev = await this.piTicketRepo.findOne({
+            where: { createdAt: Not(IsNull()) },
+            order: { toIteration: "DESC" }
+        });
+
+        const latestIteration = prev ? prev.toIteration : 2;
+
+        const iteration = this.piTicketRepo.create({
             fromIteration: latestIteration,
             toIteration: latestIteration + PI_CALCULATION_CHUNK_SIZE
         });
+
+        return this.piTicketRepo.save(iteration);
     }
 
     async updateTicketResult({ id, result }: PiTicketCompletedDto) {
@@ -31,15 +43,21 @@ export class AggregatorService {
     }
 
     async updatePiDecimal({ iteration, decimal }: UpdatePiDecimalDto) {
-        const latestIteration = await this.piDecimalRepo.maximum('iteration')
-        const piDecimal = await this.piDecimalRepo.findOne({ where: { iteration: latestIteration } })
-        const pi = new Decimal(piDecimal?.result);
-        // count = count.plus(chunkSize)
+        const piDecimal = await this.piDecimalRepo.findOne({
+            where: { id: Not(IsNull()) },
+            order: { iteration: "DESC" }
+        });
+
+        // const latestIteration = await this.piDecimalRepo.maximum('iteration')
+        // const piDecimal = await this.piDecimalRepo.findOne({ where: { iteration: latestIteration } })
+        const pi = new Decimal(piDecimal?.result ?? 3);
         const updatedPi = pi.plus(new Decimal(decimal))
-        return this.piDecimalRepo.create({
+        const newIteration = this.piDecimalRepo.create({
             iteration,
             result: updatedPi.toString()
         })
+        
+        return this.piDecimalRepo.save(newIteration);
         //
         // const truncatedPi = pi.toDecimalPlaces(digitCount, Decimal.ROUND_DOWN);
         //

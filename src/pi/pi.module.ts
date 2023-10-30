@@ -1,13 +1,25 @@
 import { Module } from '@nestjs/common';
 import { PiService } from './pi.service';
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { DB_CONNECTION_NAME } from "../common/constants/db.contants";
-import { PiTicketEntity } from "../common/entities/pi_ticket.entity";
 import { PiController } from './pi.controller';
 import { AggregatorModule } from "../aggregator/aggregator.module";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PiTicketEntity], DB_CONNECTION_NAME), AggregatorModule],
+    imports: [
+        AggregatorModule,
+        ClientsModule.register([
+            {
+                name: "PI_SERVICE",
+                transport: Transport.RMQ,
+                options: {
+                    urls: ['amqp://localhost:5672'],
+                    queue: 'pi-result',
+                    queueOptions: {
+                        durable: false
+                    }
+                }
+            }
+        ])],
     providers: [PiService],
     controllers: [PiController],
 })

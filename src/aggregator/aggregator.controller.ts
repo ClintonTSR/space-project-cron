@@ -5,8 +5,10 @@ import { PiTicketCompletedDto } from "./dto/pi-ticket-completed.dto";
 
 @Controller()
 export class AggregatorController {
+    private readonly logger = new Logger(AggregatorController.name)
+
     constructor(private readonly aggregatorService: AggregatorService,
-                private readonly logger = new Logger(AggregatorController.name)) {
+    ) {
     }
 
     @EventPattern('pi.compute_completed')

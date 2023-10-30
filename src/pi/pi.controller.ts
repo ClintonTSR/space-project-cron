@@ -12,7 +12,7 @@ export class PiController {
         @Inject('PI_SERVICE') private readonly client: ClientProxy) {
     }
 
-    @Timeout(5000)
+    @Timeout(1000)
     async startCompute() {
         const { id, fromIteration, toIteration } = await this.aggregatorService.registerTicket();
 
@@ -22,7 +22,10 @@ export class PiController {
         }); //passed from ticket
 
         this.client.emit('pi.compute_completed', {
-            id, result,
+            id,
+            fromIteration,
+            toIteration,
+            result,
         });
     }
 }

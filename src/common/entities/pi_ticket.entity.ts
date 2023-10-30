@@ -5,10 +5,10 @@ export class PiTicketEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column('numeric', { name: 'from_index' })
+    @Column({ name: 'from_iteration', type: 'int', default: '2', nullable: false })
     fromIteration!: number;
 
-    @Column('numeric', { name: 'to_index' })
+    @Column({ name: 'to_iteration', type: 'int', default: '2', nullable: false })
     toIteration!: number;
 
     // @Column({ name: 'initial_pi' })

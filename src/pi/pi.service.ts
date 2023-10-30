@@ -1,14 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from "@nestjs/typeorm";
-import { PiTicketEntity } from "../common/entities/pi_ticket.entity";
-import { DB_CONNECTION_NAME } from "../common/constants/db.contants";
 import Decimal from "decimal.js";
 import { PI_NUMERATOR } from "../common/constants/config.contants";
 import { ComputePiDto } from "./dto/compute-pi.dto";
 
 @Injectable()
 export class PiService {
-    @InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
+    // @InjectRepository(PiTicketEntity, DB_CONNECTION_NAME)
     private readonly logger = new Logger(PiService.name);
 
     computePiDecimal({ fromIteration, toIteration }: ComputePiDto) {

@@ -5,7 +5,7 @@ export class PiDecimalEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column("number", { scale: 1, precision: 1000 })
+    @Column("numeric", { scale: 1, precision: 1000 })
     iteration!: number;
 
     @Column()

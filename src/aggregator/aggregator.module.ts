@@ -10,6 +10,7 @@ import { PiDecimalEntity } from "../common/entities/pi_decimal.entity";
     imports: [TypeOrmModule.forFeature([PiTicketEntity, PiDecimalEntity], DB_CONNECTION_NAME)],
     controllers: [AggregatorController],
     providers: [AggregatorService],
+    exports: [AggregatorService]
 })
 export class AggregatorModule {
 }

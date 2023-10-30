@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PiModule } from "./pi/pi.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DB_CONNECTION_NAME } from "./common/constants/db.contants";
 import { PiTicketEntity } from "./common/entities/pi_ticket.entity";
-import { AggregatorModule } from './aggregator/aggregator.module';
+import { AggregatorModule } from "./aggregator/aggregator.module";
+import { PiModule } from "./pi/pi.module";
+import { PiDecimalEntity } from "./common/entities/pi_decimal.entity";
 
 @Module({
     imports: [
@@ -27,7 +28,7 @@ import { AggregatorModule } from './aggregator/aggregator.module';
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_DATABASE'),
                 synchronize: configService.get('NODE_ENV') === 'development',
-                entities: [PiTicketEntity],
+                entities: [PiTicketEntity, PiDecimalEntity],
 
             }),
         }),
