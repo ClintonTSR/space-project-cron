@@ -2,20 +2,25 @@ import { Module } from '@nestjs/common';
 import { PiService } from './pi.service';
 import { PiController } from './pi.controller';
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Module({
     imports: [
-        ClientsModule.register([
+        ClientsModule.registerAsync([
             {
                 name: "PI_SERVICE",
-                transport: Transport.RMQ,
-                options: {
-                    urls: ['amqp://localhost:5672'],
-                    queue: 'pi-result',
-                    queueOptions: {
-                        durable: false
+                inject: [ConfigService],
+                imports: [ConfigModule],
+                useFactory: (configService: ConfigService) => ({
+                    transport: Transport.RMQ,
+                    options: {
+                        urls: [configService.get<string>('RMQ_URL')],
+                        queue: 'pi-result',
+                        queueOptions: {
+                            durable: false
+                        }
                     }
-                }
+                }),
             }
         ])],
     providers: [PiService],

@@ -25,7 +25,7 @@ import { PiDecimalEntity } from "./common/entities/pi_decimal.entity";
                 username: configService.get('DB_USERNAME'),
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_DATABASE'),
-                synchronize: configService.get('NODE_ENV') === 'development',
+                synchronize: true, //configService.get('NODE_ENV') === 'development',
                 entities: [PiTicketEntity, PiDecimalEntity],
 
             }),
