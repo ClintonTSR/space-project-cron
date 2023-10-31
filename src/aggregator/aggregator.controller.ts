@@ -2,6 +2,7 @@ import { Controller, Inject, Logger } from '@nestjs/common';
 import { AggregatorService } from './aggregator.service';
 import { ClientProxy, EventPattern } from "@nestjs/microservices";
 import { PiTicketCompletedDto } from "./dto/pi-ticket-completed.dto";
+import { Interval } from "@nestjs/schedule";
 
 @Controller()
 export class AggregatorController {
@@ -14,7 +15,10 @@ export class AggregatorController {
     @EventPattern('pi.compute_idle')
     async distributePiTicket() {
         const ticket = await this.aggregatorService.registerTicket();
-        this.client.emit('pi.pi_ticket_available', ticket);
+
+        if (ticket) {
+            this.client.emit('pi.pi_ticket_available', ticket);
+        }
     }
 
     @EventPattern('pi.compute_completed')
@@ -27,10 +31,13 @@ export class AggregatorController {
                 message: "None of the tickets are updated",
             });
         }
+    }
 
-        await this.aggregatorService.updatePiDecimal({
-            iteration: dto.toIteration,
-            decimal: dto.result
-        })
+    @Interval(5000)
+    async aggregatePiValue() {
+        const droppedTicket = await this.aggregatorService.aggregatePi();
+        if (droppedTicket) {
+            this.client.emit('pi.pi_ticket_available', droppedTicket);
+        }
     }
 }

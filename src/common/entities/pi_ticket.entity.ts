@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('pi_tickets')
+@Unique(['fromIteration', 'toIteration'])
 export class PiTicketEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
