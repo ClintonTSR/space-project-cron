@@ -5,7 +5,6 @@ import { DB_CONNECTION_NAME } from "../common/constants/db.contants";
 import { IsNull, Not, Repository } from "typeorm";
 import { PI_CALCULATION_CHUNK_SIZE } from "../common/constants/config.contants";
 import { PiTicketCompletedDto } from "./dto/pi-ticket-completed.dto";
-import { UpdatePiDecimalDto } from "./dto/update-pi-decimal.dto";
 import { PiDecimalEntity } from "../common/entities/pi_decimal.entity";
 import Decimal from "decimal.js";
 
@@ -83,30 +82,5 @@ export class AggregatorService {
             .some(t => t.result);
 
         return hasNextResulted && tickets[unResulted];
-    }
-
-    async updatePiDecimal({ iteration, decimal }: UpdatePiDecimalDto) {
-        const piDecimal = await this.piDecimalRepo.findOne({
-            where: { id: Not(IsNull()) },
-            order: { iteration: "DESC" }
-        });
-
-        const pi = new Decimal(piDecimal?.result ?? 3);
-        const updatedPi = pi.plus(new Decimal(decimal))
-        const newIteration = await this.piDecimalRepo.update({}, {
-            iteration,
-            result: updatedPi.toString()
-        })
-
-        // return this.piDecimalRepo.save(newIteration);
-        //
-        // const truncatedPi = pi.toDecimalPlaces(digitCount, Decimal.ROUND_DOWN);
-        //
-        // if (truncatedPi.toString() !== stagedPi.toString()) {
-        //     stagedPi = truncatedPi
-        // } else {
-        //     digitCount += 1;
-        //     console.log(truncatedPi)
-        // }
     }
 }
