@@ -20,7 +20,7 @@ RUN npm ci
 
 FROM node:$NODE_VERSION as final
 
-ARG NODE_ENV=production COMMIT_SHA=latest
+ARG NODE_ENV=development COMMIT_SHA=latest
 
 ENV NODE_ENV=$NODE_ENV
 
